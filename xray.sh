@@ -403,7 +403,7 @@ getData() {
     if [[ "$TLS" = "true" || "$XTLS" = "true" ]]; then
         echo ""
         colorEcho $BLUE " 请选择伪装站类型:"
-        echo "   1) 静态网站(位于/usr/share/nginx/html)"
+        echo "   1) (推荐)静态网站, 默认使用Vincent的html模板(位于/usr/share/nginx/html)"
         echo "   2) 小说站(随机选择)"
         echo "   3) 美女站(https://imeizi.me)"
         echo "   4) 高清壁纸站(https://bing.imeizi.me)"
