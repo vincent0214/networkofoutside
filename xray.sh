@@ -403,6 +403,7 @@ getData() {
     if [[ "$TLS" = "true" || "$XTLS" = "true" ]]; then
         echo ""
         colorEcho $BLUE " 请选择伪装站类型:"
+        echo "   0) 下载Vincent静态网站(位于:/usr/share/nginx/html)"
         echo "   1) 静态网站(位于/usr/share/nginx/html)"
         echo "   2) 小说站(随机选择)"
         echo "   3) 美女站(https://imeizi.me)"
@@ -413,7 +414,7 @@ getData() {
             PROXY_URL="https://bing.imeizi.me"
         else
             case $answer in
-            1)
+            0)
                 PROXY_URL=""
 
                 # 下载网页模板到 文件夹/usr/share/nginx/html
@@ -424,6 +425,9 @@ getData() {
                 rm /usr/share/nginx/html/static_html.zip
                 mv /usr/share/nginx/html/static_html/* /usr/share/nginx/html/ 
                 rm -r /usr/share/nginx/html/static_html
+                ;; 
+            1)
+                PROXY_URL=""
                 ;;
             2)
                 len=${#SITES[@]}
