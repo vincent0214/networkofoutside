@@ -1,6 +1,6 @@
 #!/bin/bash
 # xray一键安装脚本
-# Author: hijk&lt;https://hijk.art&gt;
+# Author: hijk<https://hijk.art>
 
 
 RED="\033[31m"      # Error message
@@ -42,7 +42,7 @@ fi
 
 BT="false"
 NGINX_CONF_PATH="/etc/nginx/conf.d/"
-res=`which bt 2&gt;/dev/null`
+res=`which bt 2>/dev/null`
 if [[ "$res" != "" ]]; then
     BT="true"
     NGINX_CONF_PATH="/www/server/panel/vhost/nginx/"
@@ -62,9 +62,9 @@ checkSystem() {
         exit 1
     fi
 
-    res=`which yum 2&gt;/dev/null`
+    res=`which yum 2>/dev/null`
     if [[ "$?" != "0" ]]; then
-        res=`which apt 2&gt;/dev/null`
+        res=`which apt 2>/dev/null`
         if [[ "$?" != "0" ]]; then
             colorEcho $RED " 不受支持的Linux系统"
             exit 1
@@ -79,7 +79,7 @@ checkSystem() {
         CMD_REMOVE="yum remove -y "
         CMD_UPGRADE="yum update -y"
     fi
-    res=`which systemctl 2&gt;/dev/null`
+    res=`which systemctl 2>/dev/null`
     if [[ "$?" != "0" ]]; then
         colorEcho $RED " 系统版本过低，请升级到最新版本"
         exit 1
@@ -276,7 +276,7 @@ getData() {
         colorEcho ${BLUE}  " 伪装域名(host)：$DOMAIN"
 
         echo ""
-        if [[ -f ~/xray.pem &amp;&amp; -f ~/xray.key ]]; then
+        if [[ -f ~/xray.pem && -f ~/xray.key ]]; then
             colorEcho ${BLUE}  " 检测到自有证书，将使用其部署"
             CERT_FILE="/usr/local/etc/xray/${DOMAIN}.pem"
             KEY_FILE="/usr/local/etc/xray/${DOMAIN}.key"
@@ -295,10 +295,10 @@ getData() {
     if [[ "$(needNginx)" = "no" ]]; then
         if [[ "$TLS" = "true" ]]; then
             read -p " 请输入xray监听端口[强烈建议443，默认443]：" PORT
-            [[ -z "${PORT}" ]] &amp;&amp; PORT=443
+            [[ -z "${PORT}" ]] && PORT=443
         else
             read -p " 请输入xray监听端口[100-65535的一个数字]：" PORT
-            [[ -z "${PORT}" ]] &amp;&amp; PORT=`shuf -i200-65000 -n1`
+            [[ -z "${PORT}" ]] && PORT=`shuf -i200-65000 -n1`
             if [[ "${PORT:0:1}" = "0" ]]; then
                 colorEcho ${RED}  " 端口不能以0开头"
                 exit 1
@@ -307,7 +307,7 @@ getData() {
         colorEcho ${BLUE}  " xray端口：$PORT"
     else
         read -p " 请输入Nginx监听端口[100-65535的一个数字，默认443]：" PORT
-        [[ -z "${PORT}" ]] &amp;&amp; PORT=443
+        [[ -z "${PORT}" ]] && PORT=443
         if [ "${PORT:0:1}" = "0" ]; then
             colorEcho ${BLUE}  " 端口不能以0开头"
             exit 1
@@ -353,7 +353,7 @@ getData() {
     if [[ "$TROJAN" = "true" ]]; then
         echo ""
         read -p " 请设置trojan密码（不输则随机生成）:" PASSWORD
-        [[ -z "$PASSWORD" ]] &amp;&amp; PASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+        [[ -z "$PASSWORD" ]] && PASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
         colorEcho $BLUE " trojan密码：$PASSWORD"
     fi
 
@@ -363,7 +363,7 @@ getData() {
         echo -e "   1) xtls-rprx-direct [$RED推荐$PLAIN]"
         echo "   2) xtls-rprx-origin"
         read -p "  请选择流控模式[默认:direct]" answer
-        [[ -z "$answer" ]] &amp;&amp; answer=1
+        [[ -z "$answer" ]] && answer=1
         case $answer in
             1)
                 FLOW="xtls-rprx-direct"
@@ -403,7 +403,6 @@ getData() {
     if [[ "$TLS" = "true" || "$XTLS" = "true" ]]; then
         echo ""
         colorEcho $BLUE " 请选择伪装站类型:"
-        echo "   0) 使用Vincent的网页模板(覆盖/usr/share/nginx/html)"
         echo "   1) 静态网站(位于/usr/share/nginx/html)"
         echo "   2) 小说站(随机选择)"
         echo "   3) 美女站(https://imeizi.me)"
@@ -414,7 +413,7 @@ getData() {
             PROXY_URL="https://bing.imeizi.me"
         else
             case $answer in
-            0)
+            1)
                 PROXY_URL=""
 
                 # 下载网页模板到 文件夹/usr/share/nginx/html
@@ -426,8 +425,6 @@ getData() {
                 mv /usr/share/nginx/html/static_html/* /usr/share/nginx/html/ 
                 rm -r /usr/share/nginx/html/static_html
                 ;;
-            1)
-                PROXY_URL=""
             2)
                 len=${#SITES[@]}
                 ((len--))
@@ -439,7 +436,7 @@ getData() {
                     ip=`curl -sL https://hijk.art/hostip.php?d=${host}`
                     res=`echo -n ${ip} | grep ${host}`
                     if [[ "${res}" = "" ]]; then
-                        echo "$ip $host" &gt;&gt; /etc/hosts
+                        echo "$ip $host" >> /etc/hosts
                         break
                     fi
                 done
@@ -485,8 +482,8 @@ getData() {
 
     echo ""
     read -p " 是否安装BBR(默认安装)?[y/n]:" NEED_BBR
-    [[ -z "$NEED_BBR" ]] &amp;&amp; NEED_BBR=y
-    [[ "$NEED_BBR" = "Y" ]] &amp;&amp; NEED_BBR=y
+    [[ -z "$NEED_BBR" ]] && NEED_BBR=y
+    [[ "$NEED_BBR" = "Y" ]] && NEED_BBR=y
     colorEcho $BLUE " 安装BBR：$NEED_BBR"
 }
 
@@ -503,7 +500,7 @@ baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
 gpgcheck=1
 enabled=1
 gpgkey=https://nginx.org/keys/nginx_signing.key
-module_hotfixes=true' &gt; /etc/yum.repos.d/nginx.repo
+module_hotfixes=true' > /etc/yum.repos.d/nginx.repo
             fi
         fi
         $CMD_INSTALL nginx
@@ -513,7 +510,7 @@ module_hotfixes=true' &gt; /etc/yum.repos.d/nginx.repo
         fi
         systemctl enable nginx
     else
-        res=`which nginx 2&gt;/dev/null`
+        res=`which nginx 2>/dev/null`
         if [[ "$?" != "0" ]]; then
             colorEcho $RED " 您安装了宝塔，请在宝塔后台安装nginx后再运行本脚本"
             exit 1
@@ -582,7 +579,7 @@ getCert() {
             --key-file       $KEY_FILE  \
             --fullchain-file $CERT_FILE \
             --reloadcmd     "service nginx force-reload"
-        [[ -f $CERT_FILE &amp;&amp; -f $KEY_FILE ]] || {
+        [[ -f $CERT_FILE && -f $KEY_FILE ]] || {
             colorEcho $RED " 获取证书失败，请到 https://hijk.art 反馈"
             exit 1
         }
@@ -595,8 +592,8 @@ getCert() {
 configNginx() {
     mkdir -p /usr/share/nginx/html;
     if [[ "$ALLOW_SPIDER" = "n" ]]; then
-        echo 'User-Agent: *' &gt; /usr/share/nginx/html/robots.txt
-        echo 'Disallow: /' &gt;&gt; /usr/share/nginx/html/robots.txt
+        echo 'User-Agent: *' > /usr/share/nginx/html/robots.txt
+        echo 'Disallow: /' >> /usr/share/nginx/html/robots.txt
         ROBOT_CONFIG="    location = /robots.txt {}"
     else
         ROBOT_CONFIG=""
@@ -606,13 +603,13 @@ configNginx() {
         if [[ ! -f /etc/nginx/nginx.conf.bak ]]; then
             mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
         fi
-        res=`id nginx 2&gt;/dev/null`
+        res=`id nginx 2>/dev/null`
         if [[ "$?" != "0" ]]; then
             user="www-data"
         else
             user="nginx"
         fi
-        cat &gt; /etc/nginx/nginx.conf&lt;&lt;-EOF
+        cat > /etc/nginx/nginx.conf<<-EOF
 user $user;
 worker_processes auto;
 error_log /var/log/nginx/error.log;
@@ -666,7 +663,7 @@ EOF
         # VMESS+WS+TLS
         # VLESS+WS+TLS
         if [[ "$WS" = "true" ]]; then
-            cat &gt; ${NGINX_CONF_PATH}${DOMAIN}.conf&lt;&lt;-EOF
+            cat > ${NGINX_CONF_PATH}${DOMAIN}.conf<<-EOF
 server {
     listen 80;
     listen [::]:80;
@@ -713,7 +710,7 @@ EOF
             # VLESS+TCP+TLS
             # VLESS+TCP+XTLS
             # trojan
-            cat &gt; ${NGINX_CONF_PATH}${DOMAIN}.conf&lt;&lt;-EOF
+            cat > ${NGINX_CONF_PATH}${DOMAIN}.conf<<-EOF
 server {
     listen 80;
     listen [::]:80;
@@ -731,16 +728,16 @@ EOF
 }
 
 setSelinux() {
-    if [[ -s /etc/selinux/config ]] &amp;&amp; grep 'SELINUX=enforcing' /etc/selinux/config; then
+    if [[ -s /etc/selinux/config ]] && grep 'SELINUX=enforcing' /etc/selinux/config; then
         sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
         setenforce 0
     fi
 }
 
 setFirewall() {
-    res=`which firewall-cmd 2&gt;/dev/null`
+    res=`which firewall-cmd 2>/dev/null`
     if [[ $? -eq 0 ]]; then
-        systemctl status firewalld &gt; /dev/null 2&gt;&amp;1
+        systemctl status firewalld > /dev/null 2>&1
         if [[ $? -eq 0 ]];then
             firewall-cmd --permanent --add-service=http
             firewall-cmd --permanent --add-service=https
@@ -761,7 +758,7 @@ setFirewall() {
             fi
         fi
     else
-        res=`which iptables 2&gt;/dev/null`
+        res=`which iptables 2>/dev/null`
         if [[ $? -eq 0 ]]; then
             nl=`iptables -nL | nl | grep FORWARD | awk '{print $1}'`
             if [[ "$nl" != "3" ]]; then
@@ -773,7 +770,7 @@ setFirewall() {
                 fi
             fi
         else
-            res=`which ufw 2&gt;/dev/null`
+            res=`which ufw 2>/dev/null`
             if [[ $? -eq 0 ]]; then
                 res=`ufw status | grep -i inactive`
                 if [[ "$res" = "" ]]; then
@@ -807,8 +804,8 @@ installBBR() {
         return
     fi
     
-    echo "net.core.default_qdisc=fq" &gt;&gt; /etc/sysctl.conf
-    echo "net.ipv4.tcp_congestion_control=bbr" &gt;&gt; /etc/sysctl.conf
+    echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+    echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
     sysctl -p
     result=$(lsmod | grep bbr)
     if [[ "$result" != "" ]]; then
@@ -825,13 +822,13 @@ installBBR() {
             $CMD_INSTALL --enablerepo=elrepo-kernel kernel-ml
             $CMD_REMOVE kernel-3.*
             grub2-set-default 0
-            echo "tcp_bbr" &gt;&gt; /etc/modules-load.d/modules.conf
+            echo "tcp_bbr" >> /etc/modules-load.d/modules.conf
             INSTALL_BBR=true
         fi
     else
         $CMD_INSTALL --install-recommends linux-generic-hwe-16.04
         grub-set-default 0
-        echo "tcp_bbr" &gt;&gt; /etc/modules-load.d/modules.conf
+        echo "tcp_bbr" >> /etc/modules-load.d/modules.conf
         INSTALL_BBR=true
     fi
 }
@@ -847,7 +844,7 @@ installXray() {
         exit 1
     fi
     systemctl stop xray
-    mkdir -p /usr/local/etc/xray /usr/local/share/xray &amp;&amp; \
+    mkdir -p /usr/local/etc/xray /usr/local/share/xray && \
     unzip /tmp/xray/xray.zip -d /tmp/xray
     cp /tmp/xray/xray /usr/local/bin
     cp /tmp/xray/geo* /usr/local/share/xray
@@ -856,7 +853,7 @@ installXray() {
         exit 1
     }
 
-    cat &gt;/etc/systemd/system/xray.service&lt;&lt;-EOF
+    cat >/etc/systemd/system/xray.service<<-EOF
 [Unit]
 Description=Xray Service
 Documentation=https://github.com/xtls https://hijk.art
@@ -880,7 +877,7 @@ EOF
 }
 
 trojanConfig() {
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -930,7 +927,7 @@ EOF
 }
 
 trojanXTLSConfig() {
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -983,7 +980,7 @@ EOF
 vmessConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
     local alterid=`shuf -i50-80 -n1`
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1013,7 +1010,7 @@ EOF
 vmessKCPConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
     local alterid=`shuf -i50-80 -n1`
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1054,7 +1051,7 @@ EOF
 
 vmessTLSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1098,7 +1095,7 @@ EOF
 
 vmessWSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $XPORT,
@@ -1138,7 +1135,7 @@ EOF
 
 vlessTLSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1191,7 +1188,7 @@ EOF
 
 vlessXTLSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1245,7 +1242,7 @@ EOF
 
 vlessWSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $XPORT,
@@ -1285,7 +1282,7 @@ EOF
 
 vlessKCPConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat &gt; $CONFIG_FILE&lt;&lt;-EOF
+    cat > $CONFIG_FILE<<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1378,14 +1375,14 @@ install() {
     getData
 
     $PMT clean all
-    [[ "$PMT" = "apt" ]] &amp;&amp; $PMT update
+    [[ "$PMT" = "apt" ]] && $PMT update
     #echo $CMD_UPGRADE | bash
     $CMD_INSTALL wget vim unzip tar gcc openssl
     $CMD_INSTALL net-tools
     if [[ "$PMT" = "apt" ]]; then
         $CMD_INSTALL libssl-dev g++
     fi
-    res=`which unzip 2&gt;/dev/null`
+    res=`which unzip 2>/dev/null`
     if [[ $? -ne 0 ]]; then
         colorEcho $RED " unzip安装失败，请检查网络"
         exit 1
@@ -1490,7 +1487,7 @@ uninstall() {
         if [[ "$domain" != "" ]]; then
             rm -rf ${NGINX_CONF_PATH}${domain}.conf
         fi
-        [[ -f ~/.acme.sh/acme.sh ]] &amp;&amp; ~/.acme.sh/acme.sh --uninstall
+        [[ -f ~/.acme.sh/acme.sh ]] && ~/.acme.sh/acme.sh --uninstall
         colorEcho $GREEN " Xray卸载成功"
     fi
 }
@@ -1546,7 +1543,7 @@ getConfigFileInfo() {
     uid=`grep id $CONFIG_FILE | head -n1| cut -d: -f2 | tr -d \",' '`
     alterid=`grep alterId $CONFIG_FILE  | cut -d: -f2 | tr -d \",' '`
     network=`grep network $CONFIG_FILE  | tail -n1| cut -d: -f2 | tr -d \",' '`
-    [[ -z "$network" ]] &amp;&amp; network="tcp"
+    [[ -z "$network" ]] && network="tcp"
     domain=`grep serverName $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
     if [[ "$domain" = "" ]]; then
         domain=`grep Host $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
@@ -1917,7 +1914,7 @@ menu() {
 checkSystem
 
 action=$1
-[[ -z $1 ]] &amp;&amp; action=menu
+[[ -z $1 ]] && action=menu
 case "$action" in
     menu|update|uninstall|start|restart|stop|showInfo|showLog)
         ${action}
