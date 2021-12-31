@@ -721,7 +721,7 @@ EOF
     # 修改nginx默认页面
     rm -rf /usr/share/nginx/html
     mkdir -p /usr/share/nginx/html
-    wget wget https://github.com/vincent0214/static_html/releases/download/1.0/static_html.zip -P  /usr/share/nginx/html
+    wget https://github.com/vincent0214/static_html/releases/download/1.0/static_html.zip -P  /usr/share/nginx/html
     unzip -o -d /usr/share/nginx/html  /usr/share/nginx/html/static_html.zip
     rm /usr/share/nginx/html/static_html.zip
     mv /usr/share/nginx/html/static_html/*  /usr/share/nginx/html/ 
