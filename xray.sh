@@ -411,7 +411,6 @@ getData() {
         read -p "  请选择伪装网站类型[默认:1)(推荐)静态网站]" answer
         if [[ -z "$answer" ]]; then
             PROXY_URL=""
-            ;;
         else
             case $answer in
             1)
