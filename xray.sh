@@ -225,9 +225,6 @@ archAffix(){
         mips)
             echo 'mips32'
         ;;
-        ppc64le)
-            echo 'ppc64le'
-        ;;
         ppc64)
             echo 'ppc64'
         ;;
