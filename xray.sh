@@ -359,7 +359,7 @@ getData() {
         colorEcho $BLUE " 请选择流控模式:" 
         echo -e "   1) xtls-rprx-direct [$RED推荐$PLAIN]"
         echo "   2) xtls-rprx-origin"
-        read -ep "  请选择流控模式[默认:direct]" answer
+        read -ep "  请选择流控模式[默认:direct]：" answer
         [[ -z "$answer" ]] && answer=1
         case $answer in
             1)
@@ -405,7 +405,7 @@ getData() {
         echo "   3) 美女站(https://imeizi.me)"
         echo "   4) 高清壁纸站(https://bing.imeizi.me)"
         echo "   5) 自定义反代站点(需以http或者https开头)"
-        read -ep "  请选择伪装网站类型[默认:1)(推荐)静态网站]" answer
+        read -ep "  请选择伪装网站类型[默认:1)(推荐)静态网站]：" answer
         if [[ -z "$answer" ]]; then
             PROXY_URL=""
         else
@@ -453,23 +453,24 @@ getData() {
         REMOTE_HOST=`echo ${PROXY_URL} | cut -d/ -f3`
         colorEcho $BLUE " 伪装网站：$PROXY_URL"
 
-        echo ""
-        colorEcho $BLUE "  是否允许搜索引擎爬取网站？[默认：不允许]"
-        echo "    y)允许，会有更多ip请求网站，但会消耗一些流量，vps流量充足情况下推荐使用"
-        echo "    n)不允许，爬虫不会访问网站，访问ip比较单一，但能节省vps流量"
-        read -ep "  请选择：[y/n]" answer
-        if [[ -z "$answer" ]]; then
-            ALLOW_SPIDER="n"
-        elif [[ "${answer,,}" = "y" ]]; then
-            ALLOW_SPIDER="y"
-        else
-            ALLOW_SPIDER="n"
-        fi
+        ALLOW_SPIDER="n"
+        # echo ""
+        # colorEcho $BLUE "  是否允许搜索引擎爬取网站？[默认：不允许]"
+        # echo "    y)允许，会有更多ip请求网站，但会消耗一些流量，vps流量充足情况下推荐使用"
+        # echo "    n)不允许，爬虫不会访问网站，访问ip比较单一，但能节省vps流量"
+        # read -ep "  请选择：[y/n]：" answer
+        # if [[ -z "$answer" ]]; then
+        #     ALLOW_SPIDER="n"
+        # elif [[ "${answer,,}" = "y" ]]; then
+        #     ALLOW_SPIDER="y"
+        # else
+        #     ALLOW_SPIDER="n"
+        # fi
         colorEcho $BLUE " 允许搜索引擎：$ALLOW_SPIDER"
     fi
 
     echo ""
-    read -ep " 是否安装BBR(默认安装)?[y/n]:" NEED_BBR
+    read -ep " 是否安装BBR(默认安装)?[y/n]: " NEED_BBR
     [[ -z "$NEED_BBR" ]] && NEED_BBR=y
     [[ "$NEED_BBR" = "Y" ]] && NEED_BBR=y
     colorEcho $BLUE " 安装BBR：$NEED_BBR"
@@ -530,9 +531,9 @@ getCert() {
     if [[ -z ${CERT_FILE+x} ]]; then
         stopNginx
         systemctl stop xray
-        res=`netstat -ntlp| grep -E ':80 |:443 '`
+        res=`netstat -ntlp| grep -E ':9999 '`
         if [[ "${res}" != "" ]]; then
-            colorEcho ${RED}  " 其他进程占用了80或443端口，请先关闭再运行一键脚本"
+            colorEcho ${RED}  " 其他进程占用了9999端口，请先关闭再运行一键脚本"
             echo " 端口占用信息如下："
             echo ${res}
             exit 1
@@ -553,9 +554,9 @@ getCert() {
         ~/.acme.sh/acme.sh  --upgrade  --auto-upgrade
         ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
         if [[ "$BT" = "false" ]]; then
-            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx"  --standalone
+            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx"  --standalone --httpport 9999
         else
-            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "nginx -s stop || { echo -n ''; }" --post-hook "nginx -c /www/server/nginx/conf/nginx.conf || { echo -n ''; }"  --standalone
+            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "nginx -s stop || { echo -n ''; }" --post-hook "nginx -c /www/server/nginx/conf/nginx.conf || { echo -n ''; }"  --standalone --httpport 9999
         fi
         [[ -f ~/.acme.sh/${DOMAIN}_ecc/ca.cer ]] || {
             colorEcho $RED " 获取证书失败，请复制上面的红色文字到 https://hijk.art 反馈"
