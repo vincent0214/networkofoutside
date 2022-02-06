@@ -549,10 +549,10 @@ getCert() {
             systemctl start cron
             systemctl enable cron
         fi
-        curl -sL https://get.acme.sh | sh -s email=hijk.pw@protonmail.sh
+        curl -sL https://get.acme.sh | sh -s email=vincent0214001@gmail.sh
         source ~/.bashrc
         ~/.acme.sh/acme.sh  --upgrade  --auto-upgrade
-        ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+        # ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
         if [[ "$BT" = "false" ]]; then
             ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx"  --standalone --httpport 9999
         else
