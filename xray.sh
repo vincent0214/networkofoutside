@@ -531,9 +531,9 @@ getCert() {
     if [[ -z ${CERT_FILE+x} ]]; then
         stopNginx
         systemctl stop xray
-        res=`netstat -ntlp| grep -E ':9999 '`
+        res=`netstat -ntlp| grep -E ':80 |:443 '`
         if [[ "${res}" != "" ]]; then
-            colorEcho ${RED}  " 其他进程占用了9999端口，请先关闭再运行一键脚本"
+            colorEcho ${RED}  " 其他进程占用了80或443端口，请先关闭再运行一键脚本"
             echo " 端口占用信息如下："
             echo ${res}
             exit 1
@@ -554,9 +554,9 @@ getCert() {
         ~/.acme.sh/acme.sh  --upgrade  --auto-upgrade
         # ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
         if [[ "$BT" = "false" ]]; then
-            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx"  --standalone --httpport 9999
+            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx"  --standalone
         else
-            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "nginx -s stop || { echo -n ''; }" --post-hook "nginx -c /www/server/nginx/conf/nginx.conf || { echo -n ''; }"  --standalone --httpport 9999
+            ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "nginx -s stop || { echo -n ''; }" --post-hook "nginx -c /www/server/nginx/conf/nginx.conf || { echo -n ''; }"  --standalone
         fi
         [[ -f ~/.acme.sh/${DOMAIN}_ecc/ca.cer ]] || {
             colorEcho $RED " 获取证书失败，请复制上面的红色文字到 https://hijk.art 反馈"
