@@ -11,5 +11,5 @@
 
 
 systemctl stop nginx;
-acme.sh --renew -d 你的域名  --ecc;
+~/.acme.sh/acme.sh  --renew -d 你的域名  --ecc;
 systemctl restart nginx;
